@@ -12,7 +12,7 @@ public class Conexao {
 
     public static Connection getConexao() {
        Connection c = null;
-       System.out.println("Conectar com o BD");
+       System.out.println("Conectando com o BD...");
        
        try{
            Class.forName("org.postgresql.Driver");
@@ -22,7 +22,7 @@ public class Conexao {
            String password ="1234";
            
            c = DriverManager.getConnection(url, user, password);
-           
+           System.out.println("BD Conectado...");
        }catch(Exception e){
            e.printStackTrace();
        }

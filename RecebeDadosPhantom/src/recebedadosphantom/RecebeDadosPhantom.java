@@ -4,11 +4,13 @@ package recebedadosphantom;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import postgresDB.Conexao;
 
 public class RecebeDadosPhantom {
-    
 /******************************************************************************/    
     static class ArmazenaDadosPhanton implements Runnable{
         
@@ -42,7 +44,7 @@ public class RecebeDadosPhantom {
                         char comp2= msgString.charAt(1);
 
                         if(comp == comp2){//se tiver o caracter '?' executa
-                               System.out.println("..ARMAZENAR DADOS NO SGBD..");
+                               System.out.println("captura dados Cliente");
                                System.out.println("Cliente IP: "+ClienteIP);
                                System.out.println("Cliente Dados: "+msgLink[1]);
                                
@@ -66,24 +68,73 @@ public class RecebeDadosPhantom {
                                
                                System.out.println("Tomada ID: "+ID+"\nVolts: "+V+" volts\nCorrente: "+A+" amperes\n");
                                
-                               
+                               ArmazenaDadosSGBD armazena = new ArmazenaDadosSGBD(ID, ID, V, A);
+                               new Thread(armazena).start();
                                
                         }else{
                                System.out.println("\n\n");
                         }
                  }  
-                
                 cliente.getOutputStream().write("<html><head><title>Phantom</title></head><body></body></html>".getBytes("ISO-8859-1"));//retorna algo ao cliente
                 
                 cliente.close(); //encerra conexão
-                
+                System.out.println("Finaliza thread 1");
             } catch (IOException ex) {
                 Logger.getLogger(RecebeDadosPhantom.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+/******************************************************************************/  
+    
+/******************************************************************************/    
+    static class ArmazenaDadosSGBD implements Runnable{
+
+        String IP,ID,V,A;
+        
+        public ArmazenaDadosSGBD(String IP,String ID,String V,String A){
+            this.IP = IP;
+            this.ID = ID;
+            this.V = V;
+            this.A = A;
+        }
+        
+        @Override
+        public void run() {
+            System.out.println("..Iniciou thread SGBD..");
+            try {
+                Connection c = null;
+                PreparedStatement stmt = null;
+                
+                try{
+                    System.out.println("Vai conectar com o banco de dados...");
+                    c = Conexao.getConexao();
+                    System.out.println("Conectou com o banco de dados...");
+                    
+                    
+                    
+                    
+                    //INSERIR INFORMAÇÕES NO BANCO DE DADOS
+                    
+                    
+                    
+                    
+                    
+                    c.close();
+                    System.out.println("Encerrou conexao com BD...");
+                    
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+                
+                System.out.println("Finaliza thread 2");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    
     
     }
-/******************************************************************************/    
+/******************************************************************************/   
     
 /******************************************************************************/    
     public static void main(String[] args) throws IOException, InterruptedException {
